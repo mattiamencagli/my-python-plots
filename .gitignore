@@ -1,0 +1,9 @@
+.git
+__pycache__
+*.txt
+*.dat
+*.png
+*.jpg
+!Orbit1.jpg
+.idea/
+.ipynb_checkpoints/
