@@ -23,19 +23,23 @@ def open_reg(direc, name, jump=1, checkstop=False):
     stop=[]
     if(checkstop):
         i=0
+        print("stops : ", end = '')
         while i<len(file):
             if(file[i]=="stop\n"):
                 stop.append(i)
                 file.pop(i)
-                print("STOP, i = %d"%i)
+                print("%d, "%i, end = '')
             i += 1
         if(len(stop)!=0):
             stop.pop()
+        print()
     
     #the data
     o = np.loadtxt(file)
     print(o.shape)
-    if(jump>1): #remove some points to decrease the workload
+    
+    #remove some points to decrease the workload
+    if(jump>1):
         keep = []
         for i in range(len(o)):
             if(i%jump == 0):
@@ -89,7 +93,8 @@ def acos2(num, den, posflag):
     
     mask3 = cose <= -1.0
     arccos[mask3] = np.pi
-
+    
+    #quindi per cose>1 si ha arccos = 0
     return arccos
 
 
@@ -115,7 +120,7 @@ def cart_to_kepl(m1, pos1, vel1, m2, pos2, vel2):
     lx = dr[:,1]*dv[:,2] - dr[:,2]*dv[:,1]
     ly = dr[:,2]*dv[:,0] - dr[:,0]*dv[:,2]
     lz = dr[:,0]*dv[:,1] - dr[:,1]*dv[:,0]
-    l = np.sqrt ( lx*lx + ly*ly + lz*lz )
+    l = np.sqrt( lx*lx + ly*ly + lz*lz )
 
     vdiff2 = v2 - vcirc2
     rvr = (dr[:,0]*dv[:,0] + dr[:,1]*dv[:,1] + dr[:,2]*dv[:,2])
@@ -174,6 +179,18 @@ def cart_to_kepl(m1, pos1, vel1, m2, pos2, vel2):
 #     nu[m_comb4] = ome_nu[m_comb4] - ome[m_comb4] #true anomaly (inclined, retrograde)
 
     return a, T, e, inc, ome, Ome, nu
+
+
+################################################################################################################################
+################################################################################################################################
+def comp_t_gw_in_Gyr(a, m1, m2):
+    '''calcola tempo scala coalescenza BH, units: a[UA], m[M_sol]'''
+
+    G = 4.30091e-3 * 206264.8062471 #AU (km/s)^2 M_sol^-1
+    c = 299792.458 #km/s
+    
+    # (gli ultimi 2) il primo fattore e' per passare da sec a Gyr, il secondo e' per correggere un AU/km rimanente
+    return ( ( 5.0 * c**5 * a**4 / (265.0 * G**3 * m1 * m2 * (m1 + m2)) ) * (3.171e-17 * 1.496e+8) )
 
 
 ################################################################################################################################
