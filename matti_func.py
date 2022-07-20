@@ -15,9 +15,13 @@ def open_reg(direc, name, jump=1, checkstop=False):
     
     #masses of the bodies
     m=[]
-    while(len(file[0])<20):
-        m.append(float(file[0]))
+    idx=[]
+    while(len(file[0])<30):
+        idx.append(int((file[0].split())[0]))
+        m.append(float((file[0].split())[1]))
         file.pop(0)
+    print(idx)
+    print(m)
     
     #check how many time the reg sys has reached the synch with its center of mass
     stop=[]
@@ -36,10 +40,10 @@ def open_reg(direc, name, jump=1, checkstop=False):
     
     #the data
     o = np.loadtxt(file)
-    print(o.shape)
     
     #remove some points to decrease the workload
     if(jump>1):
+        print(o.shape)
         keep = []
         for i in range(len(o)):
             if(i%jump == 0):
@@ -49,7 +53,7 @@ def open_reg(direc, name, jump=1, checkstop=False):
     m = np.array(m)
     print(o.shape)
     
-    return o, stop, m, len(m)
+    return o, stop, m, idx, len(m)
 
 
 ################################################################################################################################
