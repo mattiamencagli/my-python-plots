@@ -199,3 +199,30 @@ def comp_t_gw_in_Gyr(a, m1, m2):
 
 ################################################################################################################################
 ################################################################################################################################
+def read_blocks(fileB, lim=40):
+    '''legge blocks_current in una lista che contiene gli array di interi co numero di particelle per ogni blocco, indicato dall'indice dell'array'''
+    
+    Nblocks = []
+    Iblocks = []
+    time = []
+    k = 0
+    b = -1
+
+    for line in fileB:
+        if(line[0]=='i'):
+            Nblocks.append(np.zeros((lim),dtype=int))
+            Iblocks.append(np.zeros((lim),dtype=int))
+            k = 0
+            b += 1
+            time.append(float(line.split()[3]))
+            continue
+        elif(line[0]=='N' or line[0]=='I' or line=='\n'):
+            continue
+        num = line.split()
+        if(int(num[0])<lim):
+            Nblocks[b][k] = int(num[1])
+            Iblocks[b][k] = int(num[3])
+            k += 1
+        else: continue
+                
+    return np.array(Nblocks), np.array(Iblocks), np.array(time), np.linspace(0,lim-1,lim)
