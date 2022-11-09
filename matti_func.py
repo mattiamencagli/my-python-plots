@@ -9,17 +9,22 @@ rad_to_deg = 180.0 / np.pi
 ################################################################################################################################
 def open_reg(direc, name, jump=1, checkstop=False):
     ''' open the files in which I write the data of the refularized systems '''
-    f = open(direc + name)
-    file=f.readlines()
-    f.close()
-    
-    #masses of the bodies
+    print(" >>> reading file " + direc + name)
+
     m=[]
     idx=[]
-    while(len(file[0])<30):
-        idx.append(int((file[0].split())[0]))
-        m.append(float((file[0].split())[1]))
-        file.pop(0)
+    extra = 0;
+    with open(direc + name) as fp:
+        file = []
+        for i, line in enumerate(fp):
+            l = line.strip()
+            if( len(l)<30 ): #first lines: contains indexes and masses of the stars
+                idx.append(int((l.split())[0]))
+                m.append(float((l.split())[1]))
+                extra += 1
+            elif( (i-extra)%jump == 0 ): #then I read the lines.
+                file.append(l)
+    
     print(idx)
     print(m)
     
@@ -40,16 +45,6 @@ def open_reg(direc, name, jump=1, checkstop=False):
     
     #the data
     o = np.loadtxt(file)
-    
-    #remove some points to decrease the workload
-    if(jump>1):
-        print(o.shape)
-        keep = []
-        for i in range(len(o)):
-            if(i%jump == 0):
-                keep.append(o[i])
-        o=keep
-    o = np.array(o)
     m = np.array(m)
     print(o.shape)
     
