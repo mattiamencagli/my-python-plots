@@ -30,18 +30,18 @@ def open_reg(direc, name, jump=1, checkstop=False):
     
     #check how many time the reg sys has reached the synch with its center of mass
     stop=[]
-    if(checkstop):
-        i=0
-        print("stops : ", end = '')
-        while i<len(file):
-            if(file[i]=="stop\n"):
-                stop.append(i)
-                file.pop(i)
-                print("%d, "%i, end = '')
-            i += 1
-        if(len(stop)!=0):
-            stop.pop()
-        print()
+#     if(checkstop):
+#         i=0
+#         print("stops : ", end = '')
+#         while i<len(file):
+#             if(file[i]=="stop\n"):
+#                 stop.append(i)
+#                 file.pop(i)
+#                 print("%d, "%i, end = '')
+#             i += 1
+#         if(len(stop)!=0):
+#             stop.pop()
+#         print()
     
     #the data
     o = np.loadtxt(file)
