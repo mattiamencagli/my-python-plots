@@ -13,14 +13,18 @@ def open_reg(direc, name, jump=1, checkstop=False):
 
     m=[]
     idx=[]
+    stop=[]
     extra = 0;
     with open(direc + name) as fp:
         file = []
         for i, line in enumerate(fp):
             l = line.strip()
-            if( len(l)<30 ): #first lines: contains indexes and masses of the stars
-                idx.append(int((l.split())[0]))
-                m.append(float((l.split())[1]))
+            if( len(l)<30 ): #first lines: contains indexes and masses of the stars, or the stop lines
+                if(l[0]=='X'):
+                    stop.append(len(file)-1) #stop cosi terra' l'indice delll'ultimo passo di uno step di tsunami
+                else:
+                    idx.append(int((l.split())[0]))
+                    m.append(float((l.split())[1]))
                 extra += 1
             elif( (i-extra)%jump == 0 ): #then I read the lines.
                 file.append(l)
@@ -28,25 +32,11 @@ def open_reg(direc, name, jump=1, checkstop=False):
     print(idx)
     print(m)
     
-    #check how many time the reg sys has reached the synch with its center of mass
-    stop=[]
-#     if(checkstop):
-#         i=0
-#         print("stops : ", end = '')
-#         while i<len(file):
-#             if(file[i]=="stop\n"):
-#                 stop.append(i)
-#                 file.pop(i)
-#                 print("%d, "%i, end = '')
-#             i += 1
-#         if(len(stop)!=0):
-#             stop.pop()
-#         print()
-    
     #the data
     o = np.loadtxt(file)
     m = np.array(m)
     print(o.shape)
+    print(stop)
     
     return o, stop, m, idx, len(m)
 
