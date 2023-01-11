@@ -36,7 +36,7 @@ def open_reg(direc, name, jump=1, checkstop=False):
     o = np.loadtxt(file)
     m = np.array(m)
     print(o.shape)
-    print(stop)
+    print("number of stops: %d"%len(stop))
     
     return o, stop, m, idx, len(m)
 
