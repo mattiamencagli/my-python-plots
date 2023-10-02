@@ -7,7 +7,7 @@ rad_to_deg = 180.0 / np.pi
 
 ################################################################################################################################
 ################################################################################################################################
-def open_reg(direc, name, jump=1, checkstop=False):
+def open_reg(direc, name, jump=1, oldfile=False):
     ''' open the files in which I write the data of the refularized systems '''
     print(" >>> reading file " + direc + name)
 
@@ -20,11 +20,17 @@ def open_reg(direc, name, jump=1, checkstop=False):
         for i, line in enumerate(fp):
             l = line.strip()
             if( len(l)<30 ): #first lines: contains indexes and masses of the stars, or the stop lines
-                if(l[0]=='X'):
-                    stop.append(len(file)-1) #stop cosi terra' l'indice delll'ultimo passo di uno step di tsunami
+                if(oldfile):
+                    if(l[0:4]=='stop'):
+                        stop.append(len(file)-1) #stop cosi terra' l'indice delll'ultimo passo di uno step di tsunami
+                    else:
+                        m.append(float((l.split())[0]))
                 else:
-                    idx.append(int((l.split())[0]))
-                    m.append(float((l.split())[1]))
+                    if(l[0]=='X'):
+                        stop.append(len(file)-1) #stop cosi terra' l'indice delll'ultimo passo di uno step di tsunami
+                    else:
+                        idx.append(int((l.split())[0]))
+                        m.append(float((l.split())[1]))
                 extra += 1
             elif( (i-extra)%jump == 0 ): #then I read the lines.
                 file.append(l)
