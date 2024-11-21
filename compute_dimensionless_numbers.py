@@ -2,7 +2,7 @@ import h5py as h5
 import numpy as np
 import os
 import re
-
+import sys
 
 # primo e secondo elemento: step e number_droplets
 # terzo e quarto elemento: avarage volume e total volume [non per il file posvel]
@@ -15,7 +15,7 @@ def read_Rava(f):
         for line in file:
             elements = line.split()
             els.append([int(elements[0]), C*(float(elements[2]))**c13])
-    return np.array(els).T
+    return np.array(els)
 
 def read_dim_fromfile(name):
     file = h5.File(name, "r")
@@ -23,8 +23,8 @@ def read_dim_fromfile(name):
     Ny = int(file.get("LBE3D").attrs["lbe_sy"][0])
     Nz = int(file.get("LBE3D").attrs["lbe_sz"][0])
     dt = int(file.get("LBE3D").attrs["lbe_diag_nsteps"][0])
-    print("Nx Ny Nz = %d %d %d"%(Nx,Ny,Nz))
-    print("dt : %d"%(dt))
+    print("Nx Ny Nz = %d %d %d"%(Nx,Ny,Nz), file=sys.stderr)
+    print("dt : %d"%(dt), file=sys.stderr)
     return Nx,Ny,Nz,dt
     file.close()
 
@@ -49,21 +49,22 @@ def swap_XZ(Nx,Nz):
     return Nx,Nz;
 
 # constants of this simulation
-viscosiy_kin = 1/6
-sigma = 0.0235 #
+viscosity_kin = 1/6
+sigma = 0.0235
 rho_tot = 1.36
 
-num_run = "512"
-direc = "/projects/0/qt15419/mmencagli/DATA/stag_"+num_run+"_run_mayo/"
+num_run = str(sys.argv[1])
+direc = "/data/storage19/mattia/DATA/stag_"+num_run+"_run_mayo/"
 
 name=direc+"RUN/density_t.0.h5"
 Nx,Ny,Nz,dt = read_dim_fromfile(name)
-numbs = find_outs(direc)
-numbs = numbs[1:] #remove step 0
+numbs = find_outs(direc+"RUN/")
+numbs = numbs[1:]  # remove step 0
+#numbs = numbs[-1:]  # only last step
 
 #Nz,Nx = swap_XZ(Nx,Nz);
 
-R_ava = read_Rava(direc+"droplets_volume_clean.dat")
+R_ava = read_Rava(direc+"droplets_volume_rho1.dat")
 
 rho1 = np.zeros((Nx,Ny,Nz)); rho1[:,:,:] = np.nan;
 #rho2 = np.zeros((Nx,Ny,Nz)); rho2[:,:,:] = np.nan;
@@ -79,9 +80,10 @@ Ca_N = np.nan;
 
 file = open("dimensionless_numbers"+num_run+".csv", "w")
 file.write("STEP, Reynolds, Weber, Capillarity, Vrms, Rava\n")
+file.flush()
 
 for t in numbs:
-    print("t = %d"%t)
+    print("t = %d"%t,file=sys.stderr)
     #name=direc+"density_t.%d.h5"%t
     #rho1[:,:,:] = read_field_fromfile(name,"rho1")
     #rho2[:,:,:] = read_field_fromfile(name,"rho2")
@@ -89,15 +91,17 @@ for t in numbs:
     vx[:,:,:] = read_field_fromfile(name,"vx")
     vy[:,:,:] = read_field_fromfile(name,"vy")
     vz[:,:,:] = read_field_fromfile(name,"vz")
+    print("   v read\n",file=sys.stderr)
     ###
     vrms = np.sqrt(np.sum(vx[:,:,:]*vx[:,:,:]+vy[:,:,:]*vy[:,:,:]+vz[:,:,:]*vz[:,:,:])/(Nx*Ny*Nz))
     #rhoA = np.sum(rho1[:,:,:])/(Nx*Ny*Nz)
     ###
     R_idx = int(t/dt)-1
-    Re_N = vrms*Nz/viscosiy_kin
+    Re_N = vrms*Nz/viscosity_kin
     We_N = rho_tot*vrms*vrms*R_ava[R_idx,1]/sigma
     Ca_N = viscosity_kin*vrms*rho_tot/sigma
     ###
-    file.write(f"{t:d}, {Re_N:1.20g}, {We_N:1.20g}, {Ca_N:1.20g}, {vrms:1.20g}, {R_ava:1.20g}\n")
+    file.write(f"{t:d}, {Re_N:1.20g}, {We_N:1.20g}, {Ca_N:1.20g}, {vrms:1.20g}, {R_ava[R_idx,1]:1.20g}\n")
+    file.flush()
 
 file.close()
