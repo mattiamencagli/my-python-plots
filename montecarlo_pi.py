@@ -1,10 +1,7 @@
 # Try with class instead
 import numpy as np
 import matplotlib.pylab as plt
-import matplotlib
-import random 
-import time
-from IPython.display import display, clear_output
+import random
 
 class MonteCarloPiEstimator:
     def __init__(self, points, dtplot):
@@ -14,10 +11,10 @@ class MonteCarloPiEstimator:
         self.y = np.zeros(self.points)
         self.circle_points = 0
         self.pi_estimate = 0
-        self.inside_x = []
-        self.inside_y = []
-        self.outside_x = []
-        self.outside_y = []
+        self.inside_x = np.zeros(self.points)
+        self.inside_y = np.zeros(self.points)
+        self.outside_x = np.zeros(self.points)
+        self.outside_y = np.zeros(self.points)
         
         # Set up the figure and axis
         self.fig, self.ax = plt.subplots(figsize=(6, 6))
@@ -47,19 +44,19 @@ class MonteCarloPiEstimator:
             # Check if the point is inside the circle
             if x**2 + y**2 <= 1:
                 self.circle_points += 1
-                self.inside_x.append(x)
-                self.inside_y.append(y)
+                self.inside_x[i] = x
+                self.inside_y[i] = y
             else:
-                self.outside_x.append(x)
-                self.outside_y.append(y)
+                self.outside_x[i] = x
+                self.outside_y[i] = y
             
             if i%self.dtplot==0:
                 # Update the π estimate
                 pi_estimate = 4 * self.circle_points / (i + 1)
                 
                 # Update the scatter plot data
-                self.inside_plot.set_data(self.inside_x, self.inside_y)
-                self.outside_plot.set_data(self.outside_x, self.outside_y)
+                self.inside_plot.set_data(self.inside_x[0:i], self.inside_y[0:i])
+                self.outside_plot.set_data(self.outside_x[0:i], self.outside_y[0:i])
                 
                 # Update the π estimate display
                 self.pi_text.set_text(f"π = {pi_estimate:.6f} - points = {i}")
@@ -69,13 +66,13 @@ class MonteCarloPiEstimator:
                 # display(self.fig)  # Display the updated plot
                 # Explicitly draw the updated plot
                 self.fig.canvas.draw()
-                self.fig.canvas.flush_events() 
+                #self.fig.canvas.flush_events() 
                 plt.pause(1e-10)
             
         plt.ioff()
         plt.show()
 
 # Example usage
-estimator = MonteCarloPiEstimator(1e6, 347)
+estimator = MonteCarloPiEstimator(1e6, 1347)
 estimator.run_simulation()
 
