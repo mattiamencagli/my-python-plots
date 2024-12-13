@@ -14,7 +14,7 @@ def read_Rava(f):
     with open(f, 'r') as file:
         for line in file:
             elements = line.split()
-            els.append([int(elements[0]), C*(float(elements[2]))**c13])
+            els.append([int(elements[0]), (C*float(elements[2]))**c13])
     return np.array(els)
 
 def read_dim_fromfile(name):
