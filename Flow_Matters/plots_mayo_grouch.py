@@ -162,7 +162,7 @@ for i,case in enumerate(cases):
     name  = "output.csv"
     #head  = np.genfromtxt(path+name, delimiter=',\t', dtype=str,   max_rows=1); print(f"header = {head}")
     Vfrac = np.genfromtxt(path+name, delimiter=',\t', dtype=float, skip_header=True)
-    
+
     # volume fraction overtime
     _ = plt.figure(1)
     _ = plt.plot(Vfrac[:,0], Vfrac[:,2], color=col, linestyle=ls, linewidth=lw, label="Gap = %s; final $V_{frac}$=%1.1f%%"%(case,Vfrac[-1,2]))
@@ -177,20 +177,20 @@ for i,case in enumerate(cases):
         _ = plt.text(0.95, 0.05, equation, verticalalignment='bottom', horizontalalignment='right', transform=plt.gca().transAxes, fontsize=12, color='black', bbox=box)
         _ = plt.legend()
 
+    # compute D32
+    name = "droplets_volume_rho1.dat"
+    step_e_num, d_vol, avg_e_tot_vol = read_nonunif_col(path+name, 1, 0)
+    Rava, D32, D33 = compute_Rava_D32_D33(len(step_e_num[0,:]), d_vol, FILTER, RF)
+
     # number of droplets overtime
     _ = plt.figure(2)
-    _ = plt.plot(Vfrac[:,0], Vfrac[:,1], color=col, linestyle=ls, linewidth=lw, label="Gap = %s; final $N_{droplets}$=%d"%(case,Vfrac[-1,1]))
+    _ = plt.plot(step_e_num[0,:], step_e_num[1,:], color=col, linestyle=ls, linewidth=lw, label="Gap = %s; final $N_{droplets}$=%d"%(case,step_e_num[1,-1]))
     if i==iEND:
         _ = plt.rc('axes', axisbelow=True)
         _ = plt.grid(alpha=0.2)
         _ = plt.xlabel("Steps")
         _ = plt.ylabel("$N_{droplets}$")
         _ = plt.legend()
-
-    # compute D32
-    name = "droplets_volume_rho1.dat"
-    step_e_num, d_vol, avg_e_tot_vol = read_nonunif_col(path+name, 1, 0)
-    Rava, D32, D33 = compute_Rava_D32_D33(len(step_e_num[0,:]), d_vol, FILTER, RF)
     
     # D32 overtime
     if FILTER: labF = " [filter R>%d]"%RF
